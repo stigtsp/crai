@@ -35,6 +35,9 @@ template :(:@search-results), q:to/HTML/;
                 <% with $search-result.meta-license { %>
                     <span class="-tag -license"><%= $_ %></span>
                 <% } %>
+                <% for $search-result.meta-tags { %>
+                    <span class="-tag"><%= $_ %></span>
+                <% } %>
             </section>
         </article>
     <% } %>

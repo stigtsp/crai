@@ -24,6 +24,7 @@ method open(IO::Path:D $path --> ::?CLASS:D)
 submethod BUILD(IO::Path:D :$path)
 {
     $!sqlite   = DBIish.connect(‘SQLite’, database => $path.child(‘sqlite’));
+
     $!sqlite.do(q:to/SQL/);
         CREATE TABLE IF NOT EXISTS archives (
             url                     text    NOT NULL,
@@ -41,6 +42,21 @@ submethod BUILD(IO::Path:D :$path)
             PRIMARY KEY (url)
         );
         SQL
+
+    $!sqlite.do(q:to/SQL/);
+        CREATE TABLE IF NOT EXISTS meta_tags (
+            archive_url             text    NOT NULL,
+            meta_tag                text    NOT NULL,
+            PRIMARY KEY (archive_url, meta_tag),
+            FOREIGN KEY (archive_url) REFERENCES archives (url)
+        );
+        SQL
+
+    $!sqlite.do(q:to/SQL/);
+        CREATE INDEX IF NOT EXISTS ix_meta_tags_meta_tag
+            ON meta_tags (meta_tag)
+        SQL
+
     # TODO: Create table for depends.
     # TODO: Create table for provides.
 
@@ -63,22 +79,31 @@ method list-archives(::?CLASS:D: --> Seq:D)
 
 class SearchResult
 {
-    has Str $.meta-name;
-    has Str $.meta-version;
-    has Str $.meta-description;
-    has Str $.meta-license;
+    has Str   $.meta-name;
+    has Str   $.meta-version;
+    has Str   $.meta-description;
+    has Str   $.meta-license;
+    has Str:D @.meta-tags;
 }
 
 has DBDish::StatementHandle $!search-archives-sth;
 method search-archives(::?CLASS:D: Str:D $query --> Seq:D)
 {
     $!search-archives-sth //= $!sqlite.prepare(q:to/SQL/);
-        SELECT meta_name        AS "meta-name",
-               meta_version     AS "meta-version",
-               meta_description AS "meta-description",
-               meta_license     AS "meta-license"
-        FROM archives
-        WHERE meta_name LIKE '%' || ?1 || '%' ESCAPE '\'
+        SELECT a.meta_name               AS "meta-name",
+               a.meta_version            AS "meta-version",
+               a.meta_description        AS "meta-description",
+               a.meta_license            AS "meta-license",
+               (
+                   SELECT group_concat(mu.meta_tag)
+                   FROM meta_tags AS mu
+                   WHERE mu.archive_url = a.url
+               ) AS "meta-tags"
+        FROM archives AS a
+             LEFT OUTER JOIN meta_tags AS mt ON mt.archive_url = a.url
+        WHERE a.meta_name LIKE '%' || ?1 || '%' ESCAPE '\'
+           OR mt.meta_tag LIKE '%' || ?1 || '%' ESCAPE '\'
+        GROUP BY a.url
         SQL
 
     given $query.trim {
@@ -90,7 +115,8 @@ method search-archives(::?CLASS:D: Str:D $query --> Seq:D)
     $!search-archives-sth.allrows(:array-of-hash)
         ==> map({
             for %^r.values -> $v is rw { $v ||= Str; }
-            SearchResult.new(|%^r);
+            my @meta-tags = split(‘,’, %^r<meta-tags> // ‘’).grep(?*).sort;
+            SearchResult.new(|%^r, :@meta-tags);
         });
 }
 
@@ -143,6 +169,7 @@ method ensure-hashes(::?CLASS:D: Str:D $url --> Nil)
 }
 
 has DBDish::StatementHandle $!ensure-meta-sth;
+has DBDish::StatementHandle $!ensure-meta-tags-sth;
 method ensure-meta(::?CLASS:D: Str:D $url --> Nil)
 {
     my $filename := self!archive-path($url);
@@ -155,6 +182,12 @@ method ensure-meta(::?CLASS:D: Str:D $url --> Nil)
             meta_source_url  = ?5,
             meta_license     = ?6
         WHERE url = ?1
+        SQL
+
+    $!ensure-meta-tags-sth //= $!sqlite.prepare(q:to/SQL/);
+        INSERT INTO meta_tags (archive_url, meta_tag)
+        VALUES (?1, ?2)
+        ON CONFLICT (archive_url, meta_tag) DO NOTHING
         SQL
 
     log ‘blue’, ‘EXTRACTING’, “$url @ $filename”;
@@ -179,6 +212,8 @@ method ensure-meta(::?CLASS:D: Str:D $url --> Nil)
         ~?$meta<source-url>,
         ~?$meta<license>,
     );
+
+    $!ensure-meta-tags-sth.execute($url, $_) for @($meta<tags> // ());
 
     log ‘green’, ‘EXTRACTED’, “$url @ $filename”;
 }
