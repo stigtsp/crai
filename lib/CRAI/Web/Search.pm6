@@ -9,8 +9,11 @@ template :(), q:to/HTML/;
     hello world
     HTML
 
-our sub search(Str:D $query)
+our sub search(Str:D $query is copy)
 {
+    $query .= trim;
+    return redirect :see-other, ‘/’ unless $query;
+
     my $title   := $query;
     my $content := search-results-template;
     content ‘text/html’, in-layout(:$title, :$query, :$content);
