@@ -98,3 +98,7 @@ and store the hash in the database.
 For each archive that has been downloaded,
 extract its metadata if it hash not yet been extracted,
 and store it in the database.
+
+### serve
+
+Serve the database over HTTP.

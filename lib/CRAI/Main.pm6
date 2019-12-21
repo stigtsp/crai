@@ -3,6 +3,7 @@ unit module CRAI::Main;
 use CRAI::ArchiveListing::CPAN;
 use CRAI::ArchiveListing::Ecosystem;
 use CRAI::Database;
+use CRAI::Web;
 
 multi MAIN(‘retrieve-archive-list’, Str:D $from, IO() :$database-path! --> Nil)
     is export
@@ -41,4 +42,11 @@ multi MAIN(‘extract-metadata’, IO() :$database-path! --> Nil)
     for $database.list-archives -> $url {
         $database.ensure-meta($url);
     }
+}
+
+multi MAIN(‘serve’, Str:D $host, Int:D $port, IO() :$database-path! --> Nil)
+    is export
+{
+    my $*crai-db := CRAI::Database.open($database-path);
+    CRAI::Web::serve($host, $port);
 }
