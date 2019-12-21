@@ -9,6 +9,7 @@ in
             pkgs.raku-nix.DBIish
             pkgs.raku-nix.Inline-Perl5
             pkgs.raku-nix.JSON-Fast
+            pkgs.raku-nix.Template-Classic
             pkgs.raku-nix.Terminal-ANSIColor
         ];
         preInstallPhase = ''

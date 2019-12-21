@@ -8,6 +8,12 @@
         "CRAI::ArchiveListing::GitHub": "lib/CRAI/ArchiveListing/GitHub.pm6",
         "CRAI::Database": "lib/CRAI/Database.pm6",
         "CRAI::Main": "lib/CRAI/Main.pm6",
-        "CRAI::Web": "lib/CRAI/Web.pm6"
-    }
+        "CRAI::Web": "lib/CRAI/Web.pm6",
+        "CRAI::Web::Home": "lib/CRAI/Web/Home.pm6",
+        "CRAI::Web::Layout": "lib/CRAI/Web/Layout.pm6",
+        "CRAI::Web::Search": "lib/CRAI/Web/Search.pm6"
+    },
+    "resources": [
+        "crai.svg"
+    ]
 }
