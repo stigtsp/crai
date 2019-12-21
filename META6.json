@@ -14,6 +14,7 @@
         "CRAI::Web::Search": "lib/CRAI/Web/Search.pm6"
     },
     "resources": [
+        "crai.css",
         "crai.svg"
     ]
 }

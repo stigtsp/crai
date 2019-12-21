@@ -1,0 +1,55 @@
+@import "reset";
+
+$gr: 1.61803398875;
+$unit: 16px;
+
+*
+{
+    box-sizing: border-box;
+}
+
+body
+{
+    font-family: sans-serif;
+    font-size: $unit;
+}
+
+em
+{
+    font-style: italic;
+}
+
+.crai--search-result
+{
+    & > h1
+    {
+        display: inline;
+        font-weight: bold;
+        line-height: $unit * $gr;
+
+        & > .-description
+        {
+            font-weight: normal;
+        }
+    }
+
+    & > .-tags
+    {
+        display: inline;
+
+        & > .-tag
+        {
+            background-color: lightgray;
+            border: solid 1px;
+            border-radius: 4px;
+            line-height: $unit * $gr;
+            padding: 0 $gr * 1px;
+        }
+
+        & > .-license
+        {
+            background-color: lightblue;
+            color: blue;
+        }
+    }
+}

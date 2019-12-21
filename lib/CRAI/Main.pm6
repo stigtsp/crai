@@ -47,6 +47,6 @@ multi MAIN(‘extract-metadata’, IO() :$database-path! --> Nil)
 multi MAIN(‘serve’, Str:D $host, Int:D $port, IO() :$database-path! --> Nil)
     is export
 {
-    my $*crai-db := CRAI::Database.open($database-path);
-    CRAI::Web::serve($host, $port);
+    my &db := { CRAI::Database.open($database-path) };
+    CRAI::Web::serve(&db, $host, $port);
 }

@@ -61,6 +61,39 @@ method list-archives(::?CLASS:D: --> Seq:D)
     $!list-archives-sth.allrows.map(*[0]);
 }
 
+class SearchResult
+{
+    has Str $.meta-name;
+    has Str $.meta-version;
+    has Str $.meta-description;
+    has Str $.meta-license;
+}
+
+has DBDish::StatementHandle $!search-archives-sth;
+method search-archives(::?CLASS:D: Str:D $query --> Seq:D)
+{
+    $!search-archives-sth //= $!sqlite.prepare(q:to/SQL/);
+        SELECT meta_name        AS "meta-name",
+               meta_version     AS "meta-version",
+               meta_description AS "meta-description",
+               meta_license     AS "meta-license"
+        FROM archives
+        WHERE meta_name LIKE '%' || ?1 || '%' ESCAPE '\'
+        SQL
+
+    given $query.trim {
+        s:g/\s+/::/;
+        s:g/(<[%_\\]>)/\\$0/;
+        $!search-archives-sth.execute($_);
+    }
+
+    $!search-archives-sth.allrows(:array-of-hash)
+        ==> map({
+            for %^r.values -> $v is rw { $v ||= Str; }
+            SearchResult.new(|%^r);
+        });
+}
+
 has DBDish::StatementHandle $!ensure-archive-sth;
 method ensure-archive(::?CLASS:D: Str:D $url --> Nil)
 {

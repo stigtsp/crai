@@ -7,6 +7,7 @@ template :(Str :$title, Str :$query, :@content), q:to/HTML/;
     <!DOCTYPE html>
     <meta charset="utf-8">
     <title>CRAI<%= $title.defined ?? “ — $title” !! ‘’ %></title>
+    <link rel="stylesheet" href="/static/crai.css">
     <form action="/search">
         <input type="search"
                name="q"

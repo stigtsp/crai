@@ -4,6 +4,7 @@ in
     pkgs.raku-nix.rakuPackage {
         name = "crai";
         src = pkgs.lib.cleanSource ./.;
+        buildInputs = [pkgs.sassc];
         depends = [
             pkgs.raku-nix.Cro-HTTP
             pkgs.raku-nix.DBIish
@@ -21,6 +22,9 @@ in
             # We also need SQLite at runtime.
             ldLibraryPath=${pkgs.lib.makeLibraryPath [pkgs.openssl pkgs.sqlite]}
             export LD_LIBRARY_PATH=$ldLibraryPath:$LD_LIBRARY_PATH
+
+            # Build Sass.
+            sassc --precision 10 resources/crai.scss resources/crai.css
         '';
         postInstallPhase = ''
             wrapProgram $out/bin/crai \
