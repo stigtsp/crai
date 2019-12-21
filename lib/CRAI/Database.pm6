@@ -4,6 +4,7 @@ use DBDish::Connection;
 use DBDish::StatementHandle;
 use DBIish;
 use Digest::SHA:from<Perl5> <sha256_hex>;
+use Digest::file:from<Perl5> <digest_file_hex>;
 use Terminal::ANSIColor;
 
 has DBDish::Connection $!sqlite;
@@ -56,7 +57,7 @@ method list-archives(::?CLASS:D: --> Seq:D)
 
     $!list-archives-sth.execute;
 
-    $!list-archives-sth.allrows(:array-of-hash);
+    $!list-archives-sth.allrows.map(*[0]);
 }
 
 has DBDish::StatementHandle $!ensure-archive-sth;
@@ -79,15 +80,38 @@ method ensure-archive(::?CLASS:D: Str:D $url --> Nil)
 
 method retrieve-archive(::?CLASS:D: Str:D $url --> Nil)
 {
-    my $url-hash := sha256_hex($url);
-    my $filename := $!archives.child($url-hash);
-
+    my $filename := self!archive-path($url);
     if $filename ~~ :e {
         log ‘blue’, ‘EXISTS’, “$url @ $filename”;
     } else {
         log ‘green’, ‘NEW’, “$url → $filename”;
         run «curl --fail --location --output “$filename” “$url”»;
     }
+}
+
+has DBDish::StatementHandle $!ensure-hashes-sth;
+method ensure-hashes(::?CLASS:D: Str:D $url --> Nil)
+{
+    my $filename := self!archive-path($url);
+
+    $!ensure-hashes-sth //= $!sqlite.prepare(q:to/SQL/);
+        UPDATE archives
+        SET md5_hash    = ?2,
+            sha1_hash   = ?3,
+            sha256_hash = ?4
+        WHERE url = ?1
+        SQL
+
+    my $hashes := <MD5 SHA-1 SHA-256>.map: { digest_file_hex($filename, $_) };
+    $!ensure-hashes-sth.execute($url, |$hashes);
+
+    log ‘green’, ‘HASHED’, “$url @ $filename”;
+}
+
+method !archive-path(::?CLASS:D: Str:D $url --> IO::Path:D)
+{
+    my $url-hash := sha256_hex($url);
+    $!archives.child($url-hash);
 }
 
 sub log(Str:D $color, Str:D $status, Str:D $message --> Nil)

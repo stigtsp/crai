@@ -21,6 +21,7 @@ in
                 --set LD_LIBRARY_PATH $ldLibraryPath \
                 --prefix PATH : ${pkgs.curl}/bin \
                 --prefix PATH : ${pkgs.git}/bin \
+                --prefix PATH : ${pkgs.gnutar}/bin \
                 --prefix PATH : ${pkgs.jq}/bin \
                 --prefix PATH : ${pkgs.rsync}/bin
 

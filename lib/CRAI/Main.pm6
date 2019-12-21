@@ -20,7 +20,7 @@ multi MAIN(‘retrieve-archives’, IO() :$database-path! --> Nil)
     is export
 {
     my $database := CRAI::Database.open($database-path);
-    for $database.list-archives -> (:$url) {
+    for $database.list-archives -> $url {
         $database.retrieve-archive($url);
     }
 }
@@ -28,7 +28,10 @@ multi MAIN(‘retrieve-archives’, IO() :$database-path! --> Nil)
 multi MAIN(‘compute-archive-hashes’, IO() :$database-path! --> Nil)
     is export
 {
-    !!!
+    my $database := CRAI::Database.open($database-path);
+    for $database.list-archives -> $url {
+        $database.ensure-hashes($url);
+    }
 }
 
 multi MAIN(‘extract-metadata’, IO() :$database-path! --> Nil)
