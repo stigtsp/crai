@@ -5,6 +5,7 @@ use DBDish::StatementHandle;
 use DBIish;
 use Digest::SHA:from<Perl5> <sha256_hex>;
 use Digest::file:from<Perl5> <digest_file_hex>;
+use JSON::Fast;
 use Terminal::ANSIColor;
 
 has DBDish::Connection $!sqlite;
@@ -106,6 +107,47 @@ method ensure-hashes(::?CLASS:D: Str:D $url --> Nil)
     $!ensure-hashes-sth.execute($url, |$hashes);
 
     log ‘green’, ‘HASHED’, “$url @ $filename”;
+}
+
+has DBDish::StatementHandle $!ensure-meta-sth;
+method ensure-meta(::?CLASS:D: Str:D $url --> Nil)
+{
+    my $filename := self!archive-path($url);
+
+    $!ensure-meta-sth //= $!sqlite.prepare(q:to/SQL/);
+        UPDATE archives
+        SET meta_name        = ?2,
+            meta_version     = ?3,
+            meta_description = ?4,
+            meta_source_url  = ?5,
+            meta_license     = ?6
+        WHERE url = ?1
+        SQL
+
+    log ‘blue’, ‘EXTRACTING’, “$url @ $filename”;
+
+    my @tar := «tar --extract --to-stdout --gunzip
+                --wildcards --file “$filename” */META6.json»;
+    my $tar := run(@tar, :out);
+
+    my $meta := try from-json($tar.out.slurp);
+    if $! {
+        log ‘red’, ‘FAILURE’, “$url @ $filename : $!”;
+        return;
+    }
+
+    multi prefix:<~?>(Any:U $x) {  $x }
+    multi prefix:<~?>(Any:D $x) { ~$x }
+    $!ensure-meta-sth.execute(
+        $url,
+        ~?$meta<name>,
+        ~?$meta<version>,
+        ~?$meta<description>,
+        ~?$meta<source-url>,
+        ~?$meta<license>,
+    );
+
+    log ‘green’, ‘EXTRACTED’, “$url @ $filename”;
 }
 
 method !archive-path(::?CLASS:D: Str:D $url --> IO::Path:D)
