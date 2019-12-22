@@ -3,7 +3,17 @@ let
 in
     pkgs.raku-nix.rakuPackage {
         name = "crai";
-        src = pkgs.lib.cleanSource ./.;
+        src = pkgs.stdenvNoCC.mkDerivation {
+            name = "crai-src";
+            phases = ["unpackPhase"];
+            unpackPhase = ''
+                mkdir $out
+                cp ${./META6.json} $out/META6.json
+                cp --recursive ${./bin} $out/bin
+                cp --recursive ${./lib} $out/lib
+                cp --recursive ${./resources} $out/resources
+            '';
+        };
         buildInputs = [pkgs.sassc];
         depends = [
             pkgs.raku-nix.Cro-HTTP

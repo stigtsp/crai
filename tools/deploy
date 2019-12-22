@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+# Bash strict mode.
+set -euo pipefail
+
+# Logging function.
+log() {
+    printf '\033[1;34m*** %s\033[0m\n' "$1"
+}
+
+# Configuration.
+ssh_login=deploy@88.198.224.56
+
+log 'Build CRAI.'
+crai_store_path=$(nix-build --no-out-link)
+
+log 'Disable the login banner.'
+ssh -T "$ssh_login" touch .hushlogin
+
+log 'Assert the login shell is Bash.'
+ssh -T "$ssh_login" <<'BASH'
+    if [ -z "$BASH" ]; then
+        1>&2 echo "Please ensure the login shell of '$(whoami)' is Bash."
+        exit 1
+    fi
+BASH
+
+log 'Assert we can run commands as root.'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    if ! sudo true; then
+        1>&2 echo "Please ensure '$(whoami)' can use sudo."
+        exit 1
+    fi
+BASH
+
+log 'Ensure dependencies of Nix are installed.'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    sudo apt-get update -y
+    sudo apt-get install -y rsync
+BASH
+
+log 'Ensure Nix is installed.'
+scp tools/install-nix "$ssh_login:install-nix"
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    if nix --version; then
+        1>&2 echo 'Nix is already installed.'
+    else
+        chmod +x install-nix
+        ./install-nix --daemon
+    fi
+BASH
+
+log 'Configure Nix.'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+
+    {
+        echo 'build-users-group = nixbld'
+        echo 'trusted-users = root deploy'
+    } | sudo tee /etc/nix/nix.conf
+
+    sudo systemctl restart nix-daemon
+BASH
+
+log 'Ensure nix-store is available uninteractively.'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    linkName=/usr/local/bin/nix-store
+    if [[ ! -f "$linkName" ]]; then
+        sudo ln -s /nix/var/nix/profiles/default/bin/nix-store "$linkName"
+    fi
+BASH
+
+log 'Upload CRAI and all of its dependencies in the Nix store.'
+nix copy --no-check-sigs --to "ssh://$ssh_login" "$crai_store_path"
