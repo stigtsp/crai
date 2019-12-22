@@ -37,19 +37,29 @@ em
     {
         display: inline;
 
+        @mixin crai--tag-style($color)
+        {
+            background-color: $color;
+            color: darken($color, 40%);
+        }
+
         & > .-tag
         {
-            background-color: lightgray;
+            @include crai--tag-style(lightgray);
             border: solid 1px;
             border-radius: 4px;
             line-height: $unit * $gr;
             padding: 0 $gr * 1px;
         }
 
-        & > .-license
+        & > .-depends
         {
-            background-color: lightblue;
-            color: blue;
+            &.-none  { @include crai--tag-style(#01FF70);  }
+            &.-few   { @include crai--tag-style(#FFDC00); }
+            &.-quite { @include crai--tag-style(#FF851B); }
+            &.-many  { @include crai--tag-style(#FF4136);    }
         }
+
+        & > .-license { @include crai--tag-style(#0074D9); }
     }
 }

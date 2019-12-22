@@ -32,9 +32,21 @@ template :(:@search-results), q:to/HTML/;
             </h1>
 
             <section class="-tags">
+                <% given $search-result.meta-depends { %>
+                    <span class="
+                        -tag
+                        -depends
+                        <% take ‘-none’  when 0 .. 0 %>
+                        <% take ‘-few’   when 1 .. 2 %>
+                        <% take ‘-quite’ when 3 .. 4 %>
+                        <% take ‘-many’  when 5 .. ∞ %>
+                    "><%= $_ %> dep<%= $_ == 1 ?? ‘’ !! ‘s’ %></span>
+                <% } %>
+
                 <% with $search-result.meta-license { %>
                     <span class="-tag -license"><%= $_ %></span>
                 <% } %>
+
                 <% for $search-result.meta-tags { %>
                     <span class="-tag"><%= $_ %></span>
                 <% } %>

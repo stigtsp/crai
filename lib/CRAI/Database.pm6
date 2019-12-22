@@ -57,7 +57,20 @@ submethod BUILD(IO::Path:D :$path)
             ON meta_tags (meta_tag)
         SQL
 
-    # TODO: Create table for depends.
+    $!sqlite.do(q:to/SQL/);
+        CREATE TABLE IF NOT EXISTS meta_depends (
+            archive_url             text    NOT NULL,
+            meta_depend             text    NOT NULL,
+            PRIMARY KEY (archive_url, meta_depend),
+            FOREIGN KEY (archive_url) REFERENCES archives (url)
+        );
+        SQL
+
+    $!sqlite.do(q:to/SQL/);
+        CREATE INDEX IF NOT EXISTS ix_meta_depends_meta_depend
+            ON meta_depends (meta_depend)
+        SQL
+
     # TODO: Create table for provides.
 
     $!archives = $path.child(‘archives’);
@@ -84,26 +97,43 @@ class SearchResult
     has Str   $.meta-description;
     has Str   $.meta-license;
     has Str:D @.meta-tags;
+    has Int   $.meta-depends;
 }
 
 has DBDish::StatementHandle $!search-archives-sth;
 method search-archives(::?CLASS:D: Str:D $query --> Seq:D)
 {
     $!search-archives-sth //= $!sqlite.prepare(q:to/SQL/);
-        SELECT a.meta_name               AS "meta-name",
-               a.meta_version            AS "meta-version",
-               a.meta_description        AS "meta-description",
-               a.meta_license            AS "meta-license",
-               (
-                   SELECT group_concat(mu.meta_tag)
-                   FROM meta_tags AS mu
-                   WHERE mu.archive_url = a.url
-               ) AS "meta-tags"
-        FROM archives AS a
-             LEFT OUTER JOIN meta_tags AS mt ON mt.archive_url = a.url
-        WHERE a.meta_name LIKE '%' || ?1 || '%' ESCAPE '\'
-           OR mt.meta_tag LIKE '%' || ?1 || '%' ESCAPE '\'
-        GROUP BY a.url
+        SELECT
+            a.meta_name               AS "meta-name",
+            a.meta_version            AS "meta-version",
+            a.meta_description        AS "meta-description",
+            a.meta_license            AS "meta-license",
+            (
+                SELECT group_concat(mu.meta_tag)
+                FROM meta_tags AS mu
+                WHERE mu.archive_url = a.url
+            ) AS "meta-tags",
+            (
+                SELECT count(*)
+                FROM meta_depends AS md
+                WHERE md.archive_url = a.url
+            ) AS "meta-depends"
+
+        FROM
+            archives AS a
+
+        WHERE
+            a.meta_name LIKE '%' || ?1 || '%' ESCAPE '\'
+                OR
+            EXISTS (
+                SELECT NULL
+                FROM meta_tags AS mt
+                WHERE
+                    mt.archive_url = a.url
+                        AND
+                    mt.meta_tag LIKE '%' || ?1 || '%' ESCAPE '\'
+            )
         SQL
 
     given $query.trim {
@@ -114,7 +144,7 @@ method search-archives(::?CLASS:D: Str:D $query --> Seq:D)
 
     $!search-archives-sth.allrows(:array-of-hash)
         ==> map({
-            for %^r.values -> $v is rw { $v ||= Str; }
+            for %^r.kv -> $k, $v is rw { $v ||= Str unless $k eq ‘meta-depends’ }
             my @meta-tags = split(‘,’, %^r<meta-tags> // ‘’).grep(?*).sort;
             SearchResult.new(|%^r, :@meta-tags);
         });
@@ -170,6 +200,7 @@ method ensure-hashes(::?CLASS:D: Str:D $url --> Nil)
 
 has DBDish::StatementHandle $!ensure-meta-sth;
 has DBDish::StatementHandle $!ensure-meta-tags-sth;
+has DBDish::StatementHandle $!ensure-meta-depends-sth;
 method ensure-meta(::?CLASS:D: Str:D $url --> Nil)
 {
     my $filename := self!archive-path($url);
@@ -188,6 +219,12 @@ method ensure-meta(::?CLASS:D: Str:D $url --> Nil)
         INSERT INTO meta_tags (archive_url, meta_tag)
         VALUES (?1, ?2)
         ON CONFLICT (archive_url, meta_tag) DO NOTHING
+        SQL
+
+    $!ensure-meta-depends-sth //= $!sqlite.prepare(q:to/SQL/);
+        INSERT INTO meta_depends (archive_url, meta_depend)
+        VALUES (?1, ?2)
+        ON CONFLICT (archive_url, meta_depend) DO NOTHING
         SQL
 
     log ‘blue’, ‘EXTRACTING’, “$url @ $filename”;
@@ -214,6 +251,11 @@ method ensure-meta(::?CLASS:D: Str:D $url --> Nil)
     );
 
     $!ensure-meta-tags-sth.execute($url, $_) for @($meta<tags> // ());
+
+    for @($meta<depends> // ()) {
+        try $!ensure-meta-depends-sth.execute($url, $_);
+        log ‘yellow’, ‘WARNING’, ~$! if $!;
+    }
 
     log ‘green’, ‘EXTRACTED’, “$url @ $filename”;
 }
