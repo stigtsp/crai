@@ -43,6 +43,7 @@ in
                 --prefix PATH : ${pkgs.git}/bin \
                 --prefix PATH : ${pkgs.gnutar}/bin \
                 --prefix PATH : ${pkgs.jq}/bin \
-                --prefix PATH : ${pkgs.rsync}/bin
+                --prefix PATH : ${pkgs.rsync}/bin \
+                --set LOCALE_ARCHIVE ${pkgs.glibcLocales}/lib/locale/locale-archive
         '';
     }
