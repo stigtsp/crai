@@ -1,10 +1,9 @@
 unit class CRAI::Database;
 
+use CRAI::Hash;
 use DBDish::Connection;
 use DBDish::StatementHandle;
 use DBIish;
-use Digest::SHA:from<Perl5> <sha256_hex>;
-use Digest::file:from<Perl5> <digest_file_hex>;
 use JSON::Fast;
 use Terminal::ANSIColor;
 
@@ -192,7 +191,8 @@ method ensure-hashes(::?CLASS:D: Str:D $url --> Nil)
         WHERE url = ?1
         SQL
 
-    my $hashes := <MD5 SHA-1 SHA-256>.map: { digest_file_hex($filename, $_) };
+    my @hash-subs := &md5-file-hex, &sha1-file-hex, &sha256-file-hex;
+    my $hashes    := @hash-subs.map: { $_($filename) };
     $!ensure-hashes-sth.execute($url, |$hashes);
 
     log ‘green’, ‘HASHED’, “$url @ $filename”;
@@ -262,7 +262,7 @@ method ensure-meta(::?CLASS:D: Str:D $url --> Nil)
 
 method !archive-path(::?CLASS:D: Str:D $url --> IO::Path:D)
 {
-    my $url-hash := sha256_hex($url);
+    my $url-hash := sha256-hex($url);
     $!archives.child($url-hash);
 }
 

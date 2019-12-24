@@ -7,6 +7,7 @@
         "CRAI::ArchiveListing::Ecosystem": "lib/CRAI/ArchiveListing/Ecosystem.pm6",
         "CRAI::ArchiveListing::GitHub": "lib/CRAI/ArchiveListing/GitHub.pm6",
         "CRAI::Database": "lib/CRAI/Database.pm6",
+        "CRAI::Hash": "lib/CRAI/Hash.pm6",
         "CRAI::Main": "lib/CRAI/Main.pm6",
         "CRAI::Web": "lib/CRAI/Web.pm6",
         "CRAI::Web::Home": "lib/CRAI/Web/Home.pm6",
