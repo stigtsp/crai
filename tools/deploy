@@ -34,6 +34,16 @@ ssh -T "$ssh_login" <<'BASH'
     fi
 BASH
 
+log 'Ensure the crai user exists.'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    if ! id crai; then
+        sudo mkdir --parents /var/lib/crai
+        sudo useradd --home-dir /var/lib/crai crai
+        sudo chown crai:crai /var/lib/crai
+    fi
+BASH
+
 log 'Ensure dependencies of Nix are installed.'
 ssh -T "$ssh_login" <<'BASH'
     set -euo pipefail
@@ -84,4 +94,20 @@ ssh -T "$ssh_login" <<'BASH'
     if [[ ! -e "$linkName" ]]; then
         sudo ln -s /etc/systemd/system "$linkName"
     fi
+BASH
+
+log 'Upload systemd units and reload them.'
+sed "s:<<CRAI>>:$crai_store_path/bin/crai:g" tools/crai-serve.service \
+    | ssh -T "$ssh_login" 'cat > crai-serve.service'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    sudo mv crai-serve.service /etc/systemd/system
+    sudo systemctl daemon-reload
+BASH
+
+log 'Enable and (re)start crai-serve.service'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    sudo systemctl enable crai-serve.service
+    sudo systemctl restart crai-serve.service
 BASH

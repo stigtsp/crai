@@ -1,0 +1,14 @@
+[Unit]
+Description=CRAI serve
+After=network.target
+StartLimitBurst=2
+StartLimitIntervalSec=10
+
+[Service]
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+ExecStart=<<CRAI>> --database-path=/var/lib/crai/database serve 0.0.0.0 80
+Restart=always
+User=crai
+
+[Install]
+WantedBy=multi-user.target

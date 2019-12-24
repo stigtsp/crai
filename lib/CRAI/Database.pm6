@@ -23,7 +23,10 @@ method open(IO::Path:D $path --> ::?CLASS:D)
 
 submethod BUILD(IO::Path:D :$path)
 {
-    $!sqlite   = DBIish.connect(‘SQLite’, database => $path.child(‘sqlite’));
+    $!archives = $path.child(‘archives’);
+    $!archives.mkdir(mode => 0o755);
+
+    $!sqlite = DBIish.connect(‘SQLite’, database => $path.child(‘sqlite’));
 
     $!sqlite.do(q:to/SQL/);
         CREATE TABLE IF NOT EXISTS archives (
@@ -72,9 +75,6 @@ submethod BUILD(IO::Path:D :$path)
         SQL
 
     # TODO: Create table for provides.
-
-    $!archives = $path.child(‘archives’);
-    $!archives.mkdir;
 }
 
 has DBDish::StatementHandle $!list-archives-sth;
