@@ -69,7 +69,7 @@ log 'Ensure nix-store is available uninteractively.'
 ssh -T "$ssh_login" <<'BASH'
     set -euo pipefail
     linkName=/usr/local/bin/nix-store
-    if [[ ! -f "$linkName" ]]; then
+    if [[ ! -e "$linkName" ]]; then
         sudo ln -s /nix/var/nix/profiles/default/bin/nix-store "$linkName"
     fi
 BASH
@@ -81,7 +81,7 @@ log 'Ensure systemd services are Nix GC roots.'
 ssh -T "$ssh_login" <<'BASH'
     set -euo pipefail
     linkName=/nix/var/nix/gcroots/systemd-system
-    if [[ ! -f "$linkName" ]]; then
-        sudo ln -Ts /etc/systemd/system "$linkName"
+    if [[ ! -e "$linkName" ]]; then
+        sudo ln -s /etc/systemd/system "$linkName"
     fi
 BASH
