@@ -76,3 +76,12 @@ BASH
 
 log 'Upload CRAI and all of its dependencies in the Nix store.'
 nix copy --no-check-sigs --to "ssh://$ssh_login" "$crai_store_path"
+
+log 'Ensure systemd services are Nix GC roots.'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    linkName=/nix/var/nix/gcroots/systemd-system
+    if [[ ! -f "$linkName" ]]; then
+        sudo ln -Ts /etc/systemd/system "$linkName"
+    fi
+BASH
