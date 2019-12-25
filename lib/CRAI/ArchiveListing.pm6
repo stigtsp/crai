@@ -3,6 +3,9 @@
 #| An archive is a tarball or zipball
 #| containing a Raku distribution.
 #|
+#| The URLs returned by an archive listing
+#| are used for populating the database.
+#|
 #| An archive listing is expected not to download the archives.
 #| Instead, it should merely return the URLs to the archives.
 unit class CRAI::ArchiveListing;
