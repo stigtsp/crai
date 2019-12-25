@@ -1,6 +1,6 @@
 unit role CRAI::Database::Upsert;
 
-use CRAI::Hash;
+use CRAI::Util::Hash;
 use DBDish::Connection;
 use DBDish::StatementHandle;
 use JSON::Fast;

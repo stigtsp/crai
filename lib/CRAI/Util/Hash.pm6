@@ -7,7 +7,7 @@ This is not an inherent problem and may be fixed later.
 
 =end pod
 
-unit module CRAI::Hash;
+unit module CRAI::Util::Hash;
 
 use OpenSSL::Digest;
 
