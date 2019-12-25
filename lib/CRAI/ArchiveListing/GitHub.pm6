@@ -27,7 +27,7 @@ my @archives = $listing.archives;
 
 =head1 DESCRIPTION
 
-List all archives in the GitHub repository.
+List all archives in a GitHub repository.
 This collection of archives is determined by the following algorithm:
 
 =begin item

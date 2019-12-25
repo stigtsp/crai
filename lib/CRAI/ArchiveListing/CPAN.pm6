@@ -1,18 +1,49 @@
-#| List all archives on CPAN
-#| except for those of the PSIXDISTS project.
+=begin pod
+
+=head1 NAME
+
+CRAI::ArchiveListing::CPAN - List all archives on CPAN
+
+=head1 SYNOPSIS
+
+=begin code
+# Construction.
+my $listing := CRAI::ArchiveListing::CPAN.new;
+
+# Or
+my $rsync-url := ‘rsync://cpan-rsync.perl.org/CPAN’;
+my $http-url  := ‘https://www.cpan.org’;
+my $listing   := CRAI::ArchiveListing::CPAN.new(:$rsync-url, :$http-url);
+
+# Query the object.
+say $listing.rsync-url;   # Used for finding archives.
+say $listing.http-url;    # Used for creating archive URLs.
+
+# List all archives
+my @archives = $listing.archives;
+.say for @archives;
+=end code
+
+=head1 DESCRIPTION
+
+List all Raku archives on CPAN.
+
+=head1 BUGS
+
+Archives that belong to the PSIXDISTS project are excluded.
+They are old, no longer maintained, and there are very many of them.
+
+=end pod
+
 unit class CRAI::ArchiveListing::CPAN;
 
 use CRAI::ArchiveListing;
 
 also is CRAI::ArchiveListing;
 
-#| The rsync URL is used to find the archives on CPAN.
 has $.rsync-url;
-
-#| The HTTP URL is used to construct the archive URLs.
 has $.http-url;
 
-#| Use the URLs for the official CPAN instance.
 multi method new(--> ::?CLASS:D)
 {
     self.new(
@@ -21,8 +52,6 @@ multi method new(--> ::?CLASS:D)
     );
 }
 
-#| Construct with the given CPAN URLs.
-#| See the documentation on the homonymous attributes.
 multi method new(Str:D :$rsync-url, Str:D :$http-url --> ::?CLASS:D)
 {
     self.bless(:$rsync-url, :$http-url);
