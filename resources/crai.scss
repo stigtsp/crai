@@ -10,13 +10,62 @@ $unit: 16px;
 
 body
 {
+    background-image: linear-gradient(#DDDDDD, #FFFFFF);
+    background-size: 1px 64px;
+    background-repeat: repeat-x;
+
     font-family: sans-serif;
     font-size: $unit;
+
+    margin: $unit * $gr;
 }
 
 em
 {
     font-style: italic;
+}
+
+.crai--header
+{
+    $logo-size: 48px;
+
+    display: grid;
+    gap: $unit * $gr;
+    grid-template-columns: $logo-size auto;
+
+    border-bottom: solid 1px;
+    margin-bottom: $unit * $gr;
+    padding-bottom: $unit * $gr;
+
+    & > a
+    {
+        background-image: url("/static/crai.svg");
+        background-size: $logo-size $logo-size;
+        color: transparent;
+
+        grid-area: 1 / 1 / 2 / 2;
+
+        display: block;
+        height: $logo-size;
+        width: $logo-size;
+    }
+
+    & > form
+    {
+        grid-area: 1 / 2 / 2 / 3;
+    }
+}
+
+.crai--footer
+{
+    border-top: solid 1px;
+    margin-top: $unit * $gr;
+    padding-top: $unit * $gr;
+
+    & > .-legal
+    {
+        line-height: $unit * $gr;
+    }
 }
 
 .crai--search-result
