@@ -8,15 +8,18 @@
         "CRAI::ArchiveListing::GitHub": "lib/CRAI/ArchiveListing/GitHub.pm6",
         "CRAI::Database": "lib/CRAI/Database.pm6",
         "CRAI::Database::Schema": "lib/CRAI/Database/Schema.pm6",
-        "CRAI::Database::Search": "lib/CRAI/Database/Search.pm6",
-        "CRAI::Database::Search::Result": "lib/CRAI/Database/Search/Result.pm6",
         "CRAI::Database::Upsert": "lib/CRAI/Database/Upsert.pm6",
+        "CRAI::ExtractMetadata": "lib/CRAI/ExtractMetadata.pm6",
         "CRAI::Main": "lib/CRAI/Main.pm6",
+        "CRAI::RetrieveArchiveList": "lib/CRAI/RetrieveArchiveList.pm6",
+        "CRAI::SearchArchives": "lib/CRAI/SearchArchives.pm6",
+        "CRAI::SearchArchives::Result": "lib/CRAI/SearchArchives/Result.pm6",
+        "CRAI::Util::Hash": "lib/CRAI/Util/Hash.pm6",
+        "CRAI::Util::Log": "lib/CRAI/Util/Log.pm6",
         "CRAI::Web": "lib/CRAI/Web.pm6",
         "CRAI::Web::Home": "lib/CRAI/Web/Home.pm6",
         "CRAI::Web::Layout": "lib/CRAI/Web/Layout.pm6",
-        "CRAI::Web::Search": "lib/CRAI/Web/Search.pm6",
-        "CRAI::Util::Hash": "lib/CRAI/Util/Hash.pm6"
+        "CRAI::Web::Search": "lib/CRAI/Web/Search.pm6"
     },
     "resources": [
         "crai.css",

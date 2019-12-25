@@ -1,12 +1,11 @@
 unit class CRAI::Database;
 
 use CRAI::Database::Schema;
-use CRAI::Database::Search;
 use CRAI::Database::Upsert;
+use CRAI::Util::Hash;
 use DBDish::Connection;
 use DBIish;
 
-also does CRAI::Database::Search;
 also does CRAI::Database::Upsert;
 
 has DBDish::Connection $.sqlite;
@@ -29,4 +28,10 @@ submethod BUILD(IO::Path:D :$path)
 
     $!sqlite = DBIish.connect(‘SQLite’, database => $path.child(‘sqlite’));
     CRAI::Database::Schema::install($!sqlite);
+}
+
+method archive-path(::?CLASS:D: Str:D $url --> IO::Path:D)
+{
+    my $url-hash := sha256-hex($url);
+    $!archives.child($url-hash);
 }

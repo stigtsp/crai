@@ -1,4 +1,4 @@
-unit class CRAI::Database::Search::Result;
+unit class CRAI::SearchArchives::Result;
 
 has Str   $.meta-name;
 has Str   $.meta-version;

@@ -1,5 +1,6 @@
 unit module CRAI::Web::Search;
 
+use CRAI::SearchArchives;
 use CRAI::Web::Layout;
 use Cro::HTTP::Router;
 use Template::Classic;
@@ -64,7 +65,8 @@ our sub search(&db, Str:D $query is copy)
     $query .= trim;
     return redirect :see-other, ‘/’ unless $query;
 
-    my @search-results = db.search-archives($query);
+    my $search-archives := CRAI::SearchArchives.new(db);
+    my @search-results = $search-archives.search-archives($query);
 
     my $title   := $query;
     my $content := search-results-template(:@search-results);
