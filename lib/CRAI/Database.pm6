@@ -105,11 +105,11 @@ method search-archives(::?CLASS:D: Str:D $query --> Seq:D)
     my $sql := BEGIN { %?RESOURCES<search.sql>.slurp };
     $!search-archives-sth //= $!sqlite.prepare($sql);
 
-    given $query.trim {
-        s:g/\s+/::/;
-        s:g/(<[%_\\]>)/\\$0/;
-        $!search-archives-sth.execute($_);
-    }
+    $!search-archives-sth.execute(
+        $query.trim
+        .subst(/\s+/, ‘::’, :g)
+        .subst(/(<[%_\\]>)/, {“\\$0”}, :g)
+    );
 
     $!search-archives-sth.allrows(:array-of-hash)
         ==> map({
