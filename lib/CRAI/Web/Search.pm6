@@ -6,6 +6,10 @@ use Template::Classic;
 
 my &search-results-template :=
 template :(:@search-results), q:to/HTML/;
+    <p class="crai--warning">
+        Version numbers in search results are currently wrong.
+        See <a href="https://github.com/chloekek/crai/issues/6">#6</a>.
+    </p>
     <% for @search-results -> $search-result { %>
         <article class="crai--search-result">
             <h1>

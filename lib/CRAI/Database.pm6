@@ -102,38 +102,8 @@ class SearchResult
 has DBDish::StatementHandle $!search-archives-sth;
 method search-archives(::?CLASS:D: Str:D $query --> Seq:D)
 {
-    $!search-archives-sth //= $!sqlite.prepare(q:to/SQL/);
-        SELECT
-            a.meta_name               AS "meta-name",
-            a.meta_version            AS "meta-version",
-            a.meta_description        AS "meta-description",
-            a.meta_license            AS "meta-license",
-            (
-                SELECT group_concat(mu.meta_tag)
-                FROM meta_tags AS mu
-                WHERE mu.archive_url = a.url
-            ) AS "meta-tags",
-            (
-                SELECT count(*)
-                FROM meta_depends AS md
-                WHERE md.archive_url = a.url
-            ) AS "meta-depends"
-
-        FROM
-            archives AS a
-
-        WHERE
-            a.meta_name LIKE '%' || ?1 || '%' ESCAPE '\'
-                OR
-            EXISTS (
-                SELECT NULL
-                FROM meta_tags AS mt
-                WHERE
-                    mt.archive_url = a.url
-                        AND
-                    mt.meta_tag LIKE '%' || ?1 || '%' ESCAPE '\'
-            )
-        SQL
+    my $sql := BEGIN { %?RESOURCES<search.sql>.slurp };
+    $!search-archives-sth //= $!sqlite.prepare($sql);
 
     given $query.trim {
         s:g/\s+/::/;

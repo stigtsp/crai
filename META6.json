@@ -16,6 +16,7 @@
     },
     "resources": [
         "crai.css",
-        "crai.svg"
+        "crai.svg",
+        "search.sql"
     ]
 }

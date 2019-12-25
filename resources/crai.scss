@@ -68,6 +68,18 @@ em
     }
 }
 
+.crai--warning
+{
+    background: #FFDC00;
+    border: solid 2px #FF851B;
+
+    font-weight: bold;
+
+    line-height: $unit * $gr;
+    margin: $unit * $gr 0;
+    padding: $unit * $gr;
+}
+
 .crai--search-result
 {
     & > h1
