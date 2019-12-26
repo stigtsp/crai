@@ -34,6 +34,8 @@ in
             sassc --precision 10 resources/crai.scss resources/crai.css
         '';
         postInstallPhase = ''
+            rm $out/bin/crai-{j,js,m}
+
             wrapProgram $out/bin/crai \
                 --set LD_LIBRARY_PATH $ldLibraryPath \
                 --prefix PATH : ${pkgs.curl}/bin \
