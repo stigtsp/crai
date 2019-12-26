@@ -34,6 +34,16 @@ ssh -T "$ssh_login" <<'BASH'
     fi
 BASH
 
+log 'Ensure the caddy user exists.'
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    if ! id caddy; then
+        sudo mkdir --parents /var/lib/caddy
+        sudo useradd --home-dir /var/lib/caddy caddy
+        sudo chown caddy:caddy /var/lib/caddy
+    fi
+BASH
+
 log 'Ensure the crai user exists.'
 ssh -T "$ssh_login" <<'BASH'
     set -euo pipefail
@@ -96,18 +106,33 @@ ssh -T "$ssh_login" <<'BASH'
     fi
 BASH
 
+log 'Configure Caddy.'
+scp tools/Caddyfile "$ssh_login:Caddyfile"
+ssh -T "$ssh_login" <<'BASH'
+    set -euo pipefail
+    sudo mkdir --parents /etc/caddy
+    sudo mv Caddyfile /etc/caddy
+BASH
+
 log 'Upload systemd units and reload them.'
+sed "s:<<CADDY>>:$crai_store_path/bin/caddy:g" tools/caddy.service \
+    | ssh -T "$ssh_login" 'cat > caddy.service'
 sed "s:<<CRAI>>:$crai_store_path/bin/crai:g" tools/crai-serve.service \
     | ssh -T "$ssh_login" 'cat > crai-serve.service'
 ssh -T "$ssh_login" <<'BASH'
     set -euo pipefail
+    sudo mv caddy.service /etc/systemd/system
     sudo mv crai-serve.service /etc/systemd/system
     sudo systemctl daemon-reload
 BASH
 
-log 'Enable and (re)start crai-serve.service'
+log 'Enable and (re)start systemd units.'
 ssh -T "$ssh_login" <<'BASH'
     set -euo pipefail
+
+    sudo systemctl enable caddy.service
+    sudo systemctl restart caddy.service
+
     sudo systemctl enable crai-serve.service
     sudo systemctl restart crai-serve.service
 BASH

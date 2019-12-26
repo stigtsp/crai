@@ -41,5 +41,7 @@ in
                 --prefix PATH : ${pkgs.jq}/bin \
                 --prefix PATH : ${pkgs.rsync}/bin \
                 --set LOCALE_ARCHIVE ${pkgs.glibcLocales}/lib/locale/locale-archive
+
+            makeWrapper ${pkgs.caddy}/bin/caddy $out/bin/caddy
         '';
     }

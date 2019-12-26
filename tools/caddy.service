@@ -1,0 +1,15 @@
+[Unit]
+Description=Caddy web server
+After=network.target
+StartLimitBurst=2
+StartLimitIntervalSec=10
+
+[Service]
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+LimitNOFILE=8192
+ExecStart=<<CADDY>> -conf /etc/caddy/Caddyfile
+Restart=always
+User=caddy
+
+[Install]
+WantedBy=multi-user.target
