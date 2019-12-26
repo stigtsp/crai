@@ -25,6 +25,11 @@ em
     font-style: italic;
 }
 
+strong
+{
+    font-weight: bold;
+}
+
 .crai--header
 {
     $logo-size: 48px;
@@ -90,7 +95,29 @@ em
 
 .crai--home
 {
-    & > h1 { @include crai--title(); }
+    display: grid;
+    column-gap: $unit * $gr;
+    grid-template-columns: 2fr 1fr 2fr 2fr;
+    & > h1      { grid-area: 1 / 2 / 2 / 4; }
+    & > img     { grid-area: 2 / 2 / 3 / 3; }
+    & > section { grid-area: 2 / 3 / 3 / 4; }
+
+    & > h1
+    {
+        @include crai--title();
+        text-align: center;
+    }
+
+    & > img
+    {
+        width: 100%;
+    }
+
+    & > section > p
+    {
+        &:not(:first-child) { margin-top: $unit * $gr; }
+        line-height: $unit * $gr;
+    }
 }
 
 .crai--archive
