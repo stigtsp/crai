@@ -4,23 +4,23 @@
 
 CRAI::ExtractMetadata - Extract metadata from archives
 
+=head1 SYNOPSIS
+
+For an example, see the signature and definition of MAIN.
+
 =head1 DESCRIPTION
 
-Metadata, in this sense, is the data stored in the I«META6.json» file of an
-archive.
+After downloading the archives with the C«CRAI::RetrieveArchives» use case,
+metadata needs to be extracted from the archives. This use case takes care of
+that.
 
-=head2 .new($db)
+For each archive that has been downloaded, extract its metadata and store it
+in the database. Metadata, in this sense, is the data stored in the
+I«META6.json» file of an archive.
 
-Instantiate a new instance.
-
-=head2 .extract-metadata
-
-Call the other overload for every archive in the database.
-
-=head2 .extract-metadata($url)
-
-Read metadata from the archive C<$url>, which must already be downloaded, and
-insert it into the SQLite database.
+Users of CRAI may use the metadata to discover what an archive is about, and
+to associate various archives with each other, e.g. when they implement
+different versions of a distribution.
 
 =end pod
 
@@ -120,4 +120,12 @@ multi method extract-metadata(::?CLASS:D: Str:D $url --> Nil)
     }
 
     log ‘green’, ‘EXTRACTED’, “$url @ $filename”;
+}
+
+multi MAIN(‘extract-metadata’, IO() :$database-path! --> Nil)
+    is export(:main)
+{
+    my $database := CRAI::Database.open($database-path);
+    my $extract-metadata := CRAI::ExtractMetadata.new($database);
+    $extract-metadata.extract-metadata;
 }

@@ -1,3 +1,24 @@
+=begin pod
+
+=head1 NAME
+
+CRAI::SearchArchives - Search archives in the database
+
+=head1 SYNOPSIS
+
+This use case is primarily invoked by the web interface. See the
+C«CRAI::SearchArchives::Web» module for an example.
+
+=head1 DESCRIPTION
+
+Search archives using a user-supplied query. There is one search result for
+the latest version of each matching I«distribution». The user can click
+through to see the different archives for that distribution.
+
+For details surrounding the search behavior, see the C«search.sql» resource.
+
+=end pod
+
 unit class CRAI::SearchArchives;
 
 use CRAI::Database;

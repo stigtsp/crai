@@ -4,19 +4,41 @@
 
 CRAI::RetrieveArchiveList - Insert archive list into database
 
+=head1 SYNOPSIS
+
+For an example, see the signature and definition of MAIN.
+
 =head1 DESCRIPTION
 
-Retrieve an archive list using an archive listing,
-and ensure each such archive is present in the database.
+This use case retrieves B«a list of» archive URLs, and stores each archive
+URL in the database.
+
+This use case B«does not» involve downloading the archives themselves. That
+is the job of the C«CRAI::RetrieveArchives» use case.
 
 =end pod
 
 unit class CRAI::RetrieveArchiveList;
 
+use CRAI::ArchiveListing::CPAN;
+use CRAI::ArchiveListing::Ecosystem;
 use CRAI::ArchiveListing;
 use CRAI::Database;
 use CRAI::Util::Log;
 use DBDish::StatementHandle;
+
+multi MAIN(‘retrieve-archive-list’, Str:D $from, IO() :$database-path! --> Nil)
+    is export(:main)
+{
+    my $archive-listing := do given $from {
+        when ‘cpan’      { CRAI::ArchiveListing::CPAN.new      }
+        when ‘ecosystem’ { CRAI::ArchiveListing::Ecosystem.new }
+        default { die “Unknown archive listing: $from” }
+    };
+    my $database := CRAI::Database.open($database-path);
+    my $retrieve-archive-list := CRAI::RetrieveArchiveList.new($database);
+    $retrieve-archive-list.retrieve-archive-list($archive-listing);
+}
 
 has CRAI::Database $!db;
 

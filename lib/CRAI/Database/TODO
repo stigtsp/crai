@@ -1,3 +1,0 @@
-Dissolve this directory into the lib/CRAI directory, and do not make
-everything a role done by CRAI::Database but rather standalone classes that
-contain a CRAI::Database pointer, like CRAI::ExtractMetadata.

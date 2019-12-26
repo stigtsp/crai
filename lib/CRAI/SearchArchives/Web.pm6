@@ -1,4 +1,4 @@
-unit module CRAI::Web::Search;
+unit module CRAI::SearchArchives::Web;
 
 use CRAI::SearchArchives;
 use CRAI::Web::Layout;
@@ -62,7 +62,7 @@ template :(:@search-results), q:to/HTML/;
     <% } %>
     HTML
 
-our sub search(&db, Str:D $query is copy)
+our sub search-archives(&db, Str:D $query is copy)
 {
     $query .= trim;
     return redirect :see-other, ‘/’ unless $query;

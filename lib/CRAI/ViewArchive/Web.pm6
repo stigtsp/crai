@@ -1,4 +1,4 @@
-unit module CRAI::Web::Archive;
+unit module CRAI::ViewArchive::Web;
 
 use CRAI::ViewArchive;
 use CRAI::Web::Layout;
@@ -56,7 +56,7 @@ template :($archive), q:to/HTML/;
     </article>
     HTML
 
-our sub archive(&db, Str:D $url)
+our sub view-archive(&db, Str:D $url)
 {
     my $view-archive := CRAI::ViewArchive.new(db);
     my $archive := $view-archive.view-archive($url);

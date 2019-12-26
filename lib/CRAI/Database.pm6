@@ -1,12 +1,9 @@
 unit class CRAI::Database;
 
 use CRAI::Database::Schema;
-use CRAI::Database::Upsert;
 use CRAI::Util::Hash;
 use DBDish::Connection;
 use DBIish;
-
-also does CRAI::Database::Upsert;
 
 has DBDish::Connection $.sqlite;
 has IO::Path           $.archives;

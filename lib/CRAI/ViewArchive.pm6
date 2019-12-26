@@ -1,3 +1,24 @@
+=begin pod
+
+=head1 NAME
+
+CRAI::ViewArchive - View information about an archive
+
+=head1 SYNOPSIS
+
+This use case is primarily invoked by the web interface. See the
+C«CRAI::ViewArchive::Web» module for an example.
+
+=head1 DESCRIPTION
+
+Given an archive URL, this use case displays information about that archive,
+as well as information about the distribution in the archive.
+
+To find out which data is displayed exactly, see the properties listed in the
+C«CRAI::ViewArchive::Archive» class.
+
+=end pod
+
 unit class CRAI::ViewArchive;
 
 use CRAI::Database;
