@@ -34,16 +34,16 @@ in
             sassc --precision 10 resources/crai.scss resources/crai.css
         '';
         postInstallPhase = ''
-            rm $out/bin/crai-{j,js,m}
-
-            wrapProgram $out/bin/crai \
-                --set LD_LIBRARY_PATH $ldLibraryPath \
-                --prefix PATH : ${pkgs.curl}/bin \
-                --prefix PATH : ${pkgs.git}/bin \
-                --prefix PATH : ${pkgs.gnutar}/bin \
-                --prefix PATH : ${pkgs.jq}/bin \
-                --prefix PATH : ${pkgs.rsync}/bin \
-                --set LOCALE_ARCHIVE ${pkgs.glibcLocales}/lib/locale/locale-archive
+            for bin in $out/bin/crai{,.profile}; do
+                wrapProgram $bin \
+                    --set LD_LIBRARY_PATH $ldLibraryPath \
+                    --prefix PATH : ${pkgs.curl}/bin \
+                    --prefix PATH : ${pkgs.git}/bin \
+                    --prefix PATH : ${pkgs.gnutar}/bin \
+                    --prefix PATH : ${pkgs.jq}/bin \
+                    --prefix PATH : ${pkgs.rsync}/bin \
+                    --set LOCALE_ARCHIVE ${pkgs.glibcLocales}/lib/locale/locale-archive
+            done
 
             makeWrapper ${pkgs.caddy}/bin/caddy $out/bin/caddy
         '';
