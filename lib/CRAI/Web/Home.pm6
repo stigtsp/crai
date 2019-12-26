@@ -6,8 +6,10 @@ use Template::Classic;
 
 my &home-template :=
 template :(), q:to/HTML/;
-    <h1>Comprehensive Raku Archive Index</h1>
-    <img alt="CRAI" src="/static/crai.svg">
+    <article class="crai--home">
+        <h1>Comprehensive Raku Archive Index</h1>
+        <img alt="CRAI" src="/static/crai.svg">
+    </article>
     HTML
 
 our sub home

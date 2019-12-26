@@ -16,7 +16,10 @@
         "CRAI::SearchArchives::Result": "lib/CRAI/SearchArchives/Result.pm6",
         "CRAI::Util::Hash": "lib/CRAI/Util/Hash.pm6",
         "CRAI::Util::Log": "lib/CRAI/Util/Log.pm6",
+        "CRAI::ViewArchive": "lib/CRAI/ViewArchive.pm6",
+        "CRAI::ViewArchive::Archive": "lib/CRAI/ViewArchive/Archive.pm6",
         "CRAI::Web": "lib/CRAI/Web.pm6",
+        "CRAI::Web::Archive": "lib/CRAI/Web/Archive.pm6",
         "CRAI::Web::Home": "lib/CRAI/Web/Home.pm6",
         "CRAI::Web::Layout": "lib/CRAI/Web/Layout.pm6",
         "CRAI::Web::Search": "lib/CRAI/Web/Search.pm6"

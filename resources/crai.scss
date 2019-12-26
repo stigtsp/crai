@@ -1,7 +1,7 @@
 @import "reset";
 
 $gr: 1.61803398875;
-$unit: 16px;
+$unit: 14px;
 
 *
 {
@@ -78,6 +78,63 @@ em
     line-height: $unit * $gr;
     margin: $unit * $gr 0;
     padding: $unit * $gr;
+}
+
+@mixin crai--title()
+{
+    font-size: 2 * $unit;
+    font-weight: bold;
+    line-height: 2 * $unit * $gr;
+    margin-bottom: $unit * $gr;
+}
+
+.crai--home
+{
+    & > h1 { @include crai--title(); }
+}
+
+.crai--archive
+{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: $unit * $gr;
+
+    & > h1
+    {
+        @include crai--title();
+        grid-area: 1 / 1 / 2 / 3;
+    }
+
+    & > table
+    {
+        &.-archive      { grid-area: 2 / 1 / 3 / 2; }
+        &.-distribution { grid-area: 2 / 2 / 3 / 3; }
+
+        border-bottom: solid 1px;
+        border-right: solid 1px;
+
+        width: 100%;
+
+        &.-archive      > tbody > tr > th { background: #7FDBFF; }
+        &.-distribution > tbody > tr > th { background: #01FF70; }
+
+        & > tbody > tr
+        {
+            & > th
+            {
+                font-weight: bold;
+                text-align: left;
+            }
+
+            & > th, & > td
+            {
+                border-left: solid 1px;
+                border-top: solid 1px;
+                line-height: $unit * $gr;
+                padding: $unit * $gr / 2;
+            }
+        }
+    }
 }
 
 .crai--search-result

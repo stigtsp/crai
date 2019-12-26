@@ -30,5 +30,5 @@ method version-link(::?CLASS:D: --> Str:D)
 
 method archive-link(::?CLASS:D: --> Str:D)
 {
-    “/archive/{uri_encode($!url)}”;
+    “/archive?url={uri_encode($!url)}”;
 }
