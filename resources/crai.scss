@@ -113,6 +113,9 @@ em
             padding: 0 $gr * 1px;
         }
 
+        & > .-archive-link { @include crai--tag-style(#3D9970) }
+        & > .-archive-link:visited { @include crai--tag-style(#B10DC9) }
+
         & > .-depends
         {
             &.-none  { @include crai--tag-style(#01FF70);  }

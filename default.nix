@@ -22,6 +22,7 @@ in
             pkgs.raku-nix.OpenSSL
             pkgs.raku-nix.Template-Classic
             pkgs.raku-nix.Terminal-ANSIColor
+            pkgs.raku-nix.URI-Encode
         ];
         preInstallPhase = ''
             # We need OpenSSL during compilation and at runtime.

@@ -18,12 +18,12 @@ template :(:@search-results), q:to/HTML/;
 
                 <% with $search-result.meta-name { %>
                     <% ++$title; %>
-                    <span class="-name"><%= $_ %></span>
+                    <a class="-name" href="<%= $search-result.distribution-link %>"><%= $_ %></a>
                 <% } %>
 
                 <% with $search-result.meta-version { %>
                     <% ++$title; %>
-                    <span class="-version"><%= $_ %></span>
+                    <a class="-version" href="<%= $search-result.version-link %>"><%= $_ %></a>
                 <% } %>
 
                 <% with $search-result.meta-description { %>
@@ -37,6 +37,8 @@ template :(:@search-results), q:to/HTML/;
             </h1>
 
             <section class="-tags">
+                <a class="-tag -archive-link" href="<%= $search-result.archive-link %>">archive</a>
+
                 <% given $search-result.meta-depends { %>
                     <span class="
                         -tag

@@ -3,6 +3,7 @@
 -- ?1 is the search query with LIKE characters escaped.
 
 SELECT
+    ranked_archives.url              AS "url",
     ranked_archives.meta_name        AS "meta-name",
     ranked_archives.meta_version     AS "meta-version",
     ranked_archives.meta_description AS "meta-description",
