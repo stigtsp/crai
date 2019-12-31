@@ -82,6 +82,8 @@ about each command, see the source file that is named after it.
  3. [compute-archive-hashes](lib/CRAI/ComputeArchiveHashes.pm6)
  4. [extract-metadata](lib/CRAI/ExtractMetadata.pm6)
 
+The command update-database runs all of these commands in succession.
+
 Source code organization
 ------------------------
 

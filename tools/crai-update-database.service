@@ -1,0 +1,8 @@
+[Unit]
+Description=CRAI update-database
+After=network.target
+
+[Service]
+ExecStart=<<CRAI>> --database-path=/var/lib/crai/database update-database
+Type=oneshot
+User=crai

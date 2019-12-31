@@ -119,10 +119,15 @@ sed "s:<<CADDY>>:$crai_store_path/bin/caddy:g" tools/caddy.service \
     | ssh -T "$ssh_login" 'cat > caddy.service'
 sed "s:<<CRAI>>:$crai_store_path/bin/crai:g" tools/crai-serve.service \
     | ssh -T "$ssh_login" 'cat > crai-serve.service'
+sed "s:<<CRAI>>:$crai_store_path/bin/crai:g" tools/crai-update-database.service \
+    | ssh -T "$ssh_login" 'cat > crai-update-database.service'
+scp tools/crai-update-database.timer "$ssh_login:crai-update-database.timer"
 ssh -T "$ssh_login" <<'BASH'
     set -euo pipefail
     sudo mv caddy.service /etc/systemd/system
     sudo mv crai-serve.service /etc/systemd/system
+    sudo mv crai-update-database.service /etc/systemd/system
+    sudo mv crai-update-database.timer /etc/systemd/system
     sudo systemctl daemon-reload
 BASH
 
@@ -135,4 +140,7 @@ ssh -T "$ssh_login" <<'BASH'
 
     sudo systemctl enable crai-serve.service
     sudo systemctl restart crai-serve.service
+
+    sudo systemctl enable crai-update-database.timer
+    sudo systemctl restart crai-update-database.timer
 BASH

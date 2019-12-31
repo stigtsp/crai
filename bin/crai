@@ -3,3 +3,11 @@ use CRAI::ExtractMetadata :main;
 use CRAI::RetrieveArchiveList :main;
 use CRAI::RetrieveArchives :main;
 use CRAI::Web :main;
+
+multi MAIN(‘update-database’, IO() :$database-path! --> Nil)
+{
+    MAIN(‘retrieve-archive-list’, ‘cpan’, :$database-path);
+    MAIN(‘retrieve-archive-list’, ‘ecosystem’, :$database-path);
+    MAIN(‘compute-archive-hashes’, :$database-path);
+    MAIN(‘extract-metadata’, :$database-path);
+}
