@@ -70,7 +70,8 @@ method compute-archive-hashes(::?CLASS:D: --> Nil)
 {
     $!list-archives-sth.execute;
     for $!list-archives-sth.allrows -> ($url) {
-        self!ensure-hashes($url);
+        try self!ensure-hashes($url);
+        log ‘red’, ‘FAILURE’, “$url ! $!” if $!;
     }
 }
 
